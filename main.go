@@ -6,6 +6,9 @@ import (
 	"log"
 )
 
+// Function to get the bots token. It can be either passed as a command-line
+// argument, or be read from stdin if no argument is present.
+// If neither of those succeed, the function will exit the program.
 func token() string {
 	tok := ""
 
@@ -22,6 +25,7 @@ func token() string {
 	return tok
 }
 
+// Pytho entry point.
 func main() {
 	tok := token()
 

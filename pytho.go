@@ -6,6 +6,7 @@ import (
 	tg "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
+// All lennies Pytho provides
 var lennies = map[string]string {
 	"lenny": "( ͡° ͜ʖ ͡°)",
 	"fast": "ᕕ( ͡° ͜ʖ ͡°)ᕗ",
@@ -21,10 +22,14 @@ var lennies = map[string]string {
 	"tableflip": "(ノ͡° ͜ʖ ͡°)ノ︵┻┻",
 	"deag": "( ͡° ͜ʖ ͡°)=ε/̵͇̿̿/’̿’̿ ̿",
 	"australia": "( ͜。 ͡ʖ ͜。)",
+	"chong": "( ͡- ͜ʖ ͡-)",
+	"meh": "( ͡°_ʖ ͡° )",
 }
 
+// A formatted list to reply to '/lennies'.
 var lenniesList string
 
+// Initialize this module, generate lenniesList
 func init() {
 	var buffer bytes.Buffer
 
@@ -40,11 +45,13 @@ func init() {
 	lenniesList = buffer.String()
 }
 
+// Pytho bot.
 type Pytho struct {
+	// The underlying bot.
 	Bot
-	lennies string
 }
 
+// Initialize Pytho with a Telegram API-token and a timeout in seconds.
 func (p *Pytho) Init(token string, timeout int) error {
 	err := p.Bot.Init(token, timeout)
 	if err != nil {
@@ -57,10 +64,12 @@ func (p *Pytho) Init(token string, timeout int) error {
 	return nil
 }
 
+// Handle the '/lennies' command
 func (p *Pytho) handleLennies(msg *tg.Message) {
 	p.QuickSend(msg, lenniesList);
 }
 
+// Handle the '/lenny' command
 func (p *Pytho) handleLenny(msg *tg.Message) {
 	args := strings.Split(msg.Text, " ")
 

@@ -6,15 +6,22 @@ import (
 	tg "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
+// A type of a function pointer representing a message handler.
 type Handler func(*tg.Message)
 
+// A generic Telegram bot which can listen for commands.
 type Bot struct {
+	// tgbotapi bot.
 	*tg.BotAPI
+	// Set to true to log debug info.
 	Debug bool
+	// The updates channel
 	updates tg.UpdatesChannel
+	// A map of regexes and their registered handlers.
 	handlers map[*regexp.Regexp]Handler
 }
 
+// Initialize this bot with a Telegram API-token and a timeout in seconds.
 func (bot *Bot) Init(token string, timeout int) error {
 	var err error
 	bot.BotAPI, err = tg.NewBotAPI(token)
@@ -40,6 +47,8 @@ func (bot *Bot) Init(token string, timeout int) error {
 	return nil
 }
 
+// Register a handler to this bot. The handler is invoked when 
+// a message is received which regex-matches pattern.
 func (bot *Bot) Register(pattern string, handler Handler) error {
 	re, err := regexp.Compile(pattern)
 	if err != nil {
@@ -55,10 +64,13 @@ func (bot *Bot) Register(pattern string, handler Handler) error {
 	return nil
 }
 
-func (bot *Bot) RegisterCommand(cmd string, handler Handler) error {
-	return bot.Register("^\\/" + cmd + "(\\s+|$)", handler)
+// Register a commandhandler. The handler is invoked when a message is
+// received which starts with /command. 
+func (bot *Bot) RegisterCommand(command string, handler Handler) error {
+	return bot.Register("^\\/" + command + "(\\s+|$)", handler)
 }
 
+// Listen for updates, and handle messages when they are received.
 func (bot *Bot) Listen() {
 	for update := range bot.updates {
 		if update.Message == nil {
@@ -73,6 +85,7 @@ func (bot *Bot) Listen() {
 	}
 }
 
+// Handle a single message, calling the appropriate handlers.
 func (bot *Bot) handle(msg *tg.Message) {
 	go func() {
 		for re, handler := range bot.handlers {
@@ -86,6 +99,8 @@ func (bot *Bot) handle(msg *tg.Message) {
 	}()
 }
 
+// Helper function to easily send a message to the chat another message
+// appears in.
 func (bot *Bot) QuickSend(origin *tg.Message, text string) {
 	bot.Send(tg.NewMessage(origin.Chat.ID, text))
 }
