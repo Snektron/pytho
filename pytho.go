@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"strings"
+	"math/rand"
 	tg "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
@@ -60,6 +61,7 @@ func (p *Pytho) Init(token string, timeout int) error {
 
 	p.RegisterCommand("lennies", p.handleLennies)
 	p.RegisterCommand("lenny", p.handleLenny)
+	p.RegisterCommand("bf", p.handleBrainfuck)
 
 	return nil
 }
@@ -71,16 +73,68 @@ func (p *Pytho) handleLennies(msg *tg.Message) {
 
 // Handle the '/lenny' command
 func (p *Pytho) handleLenny(msg *tg.Message) {
-	args := strings.Split(msg.Text, " ")
+	p.QuickSend(msg, decodeLennyArgs(msg.Text))
+}
 
-	if len(args) >= 2 {
-		lenny, ok := lennies[strings.ToLower(args[1])]
-		if !ok {
-			p.QuickSend(msg, "Error: invalid lenny");
-		} else {
-			p.QuickSend(msg, lenny);
-		}
+// Decode a string and use the first argument to get the
+// right lenny.
+func decodeLennyArgs(text string) string {
+	args := strings.Split(text, " ")
+
+	if len(args) < 2 {
+		return lennies["lenny"]
+	} else if args[1] == "random" {
+		return ranLenny()
+	}
+
+	lenny, ok := lennies[strings.ToLower(args[1])]
+
+	if ok {
+		return lenny
 	} else {
-		p.QuickSend(msg, lennies["lenny"]);
+		return "Error: invalid lenny"
+	}
+}
+
+// Return a random lenny. Panics if no random lenny was picked (should never happen).
+func ranLenny() string {
+	i := rand.Intn(len(lennies))
+	for _, v := range lennies {
+		if i == 0 {
+			return v
+		}
+		i--
+	}
+
+	panic("Internal error")
+}
+
+// handle the '/bf' command
+func (p *Pytho) handleBrainfuck(msg *tg.Message) {
+	args := strings.SplitN(msg.Text, " ", 2)
+
+	if len(args) == 1 {
+		p.QuickReply(msg, "Error: Not enough arguments")
+	}
+
+	data := strings.SplitN(args[1], "@", 2)
+	input := ""
+
+	if len(data) == 2 {
+		input = data[1]
+	}
+
+	var bf BrainfuckContext
+	bf.Init(data[0], input)
+	err := bf.Exec()
+
+	if err != nil {
+		p.QuickReply(msg, "Error: " + err.Error())
+	}
+
+	output := bf.Output()
+
+	if output != "" {
+		p.QuickReply(msg, output)
 	}
 }
