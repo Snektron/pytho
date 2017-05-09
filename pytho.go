@@ -2,38 +2,42 @@ package main
 
 import (
 	"log"
-	"gopkg.in/telegram-bot-api.v4"
+	"github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 type Pytho struct {
 	bot *tgbotapi.BotAPI
-	u tgbotapi.UpdateConfig
+	updates tgbotapi.UpdatesChannel
 }
 
-func (p *Pytho) init(token string, timeout int) error {
+func (p *Pytho) Init(token string, timeout int) error {
 	bot, err := tgbotapi.NewBotAPI(token)
-
-	log.Printf("Authorized on account @%s", bot.Self.UserName)
 
 	if err != nil {
 		return err
 	}
 
-	p.bot = bot;
-	p.u = tgbotapi.NewUpdate(0)
-	p.u.Timeout = timeout
+	log.Printf("Authorized on account @%s", bot.Self.UserName)
+	
+	u := tgbotapi.NewUpdate(0)
+	u.Timeout = timeout
+
+	updates, err := bot.GetUpdatesChan(u)
+
+	if err != nil {
+		return err
+	}
+
+		updates.Clear()
+
+	p.bot = bot
+	p.updates = updates
 
 	return nil
 }
 
-func (p *Pytho) Listen() error {
-	updates, err := p.bot.GetUpdatesChan(p.u)
-
-	if err != nil {
-		return err
-	}
-
-	for update := range updates {
+func (p *Pytho) Listen() {
+	for update := range p.updates {
 		if update.Message == nil {
 			continue
 		}
@@ -45,6 +49,4 @@ func (p *Pytho) Listen() error {
 
 		p.bot.Send(msg)
 	}
-
-	return nil
 }

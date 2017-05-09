@@ -26,7 +26,7 @@ func main() {
 	tok := getToken()
 
 	var pytho Pytho
-	if err := pytho.init(tok, 60); err != nil {
+	if err := pytho.Init(tok, 60); err != nil {
 		log.Panic(err)
 	}
 
