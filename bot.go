@@ -101,6 +101,13 @@ func (bot *Bot) handle(msg *tg.Message) {
 
 // Helper function to easily send a message to the chat another message
 // appears in.
-func (bot *Bot) QuickSend(origin *tg.Message, text string) {
-	bot.Send(tg.NewMessage(origin.Chat.ID, text))
+func (bot *Bot) QuickSend(msg *tg.Message, text string) {
+	bot.Send(tg.NewMessage(msg.Chat.ID, text))
+}
+
+// Helper function to easily reply to a message
+func (bot *Bot) QuickReply(msg *tg.Message, text string) {
+	reply := tg.NewMessage(msg.Chat.ID, text)
+	reply.ReplyToMessageID = msg.MessageID
+	bot.Send(reply)
 }
