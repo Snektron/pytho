@@ -6,7 +6,7 @@ import (
 	"log"
 )
 
-func getToken() string {
+func token() string {
 	tok := ""
 
 	if len(os.Args) < 2 {
@@ -23,12 +23,12 @@ func getToken() string {
 }
 
 func main() {
-	tok := getToken()
+	tok := token()
 
-	var pytho Pytho
-	if err := pytho.Init(tok, 60); err != nil {
+	var bot Bot
+	if err := bot.Init(tok, 60); err != nil {
 		log.Panic(err)
 	}
 
-	pytho.Listen()
+	bot.Listen()
 }
