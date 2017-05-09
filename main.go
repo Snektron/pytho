@@ -25,10 +25,13 @@ func token() string {
 func main() {
 	tok := token()
 
-	var bot Bot
-	if err := bot.Init(tok, 60); err != nil {
+	var pytho Pytho
+	pytho.Debug = true
+
+	err := pytho.Init(tok, 60)
+	if err != nil {
 		log.Panic(err)
 	}
 
-	bot.Listen()
+	pytho.Listen()
 }
