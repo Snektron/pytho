@@ -56,7 +56,7 @@ func (bot *Bot) Register(pattern string, handler Handler) error {
 }
 
 func (bot *Bot) RegisterCommand(cmd string, handler Handler) error {
-	return bot.Register("^\\/" + cmd, handler)
+	return bot.Register("^\\/" + cmd + "(\\s+|$)", handler)
 }
 
 func (bot *Bot) Listen() {
