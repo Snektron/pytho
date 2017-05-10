@@ -67,7 +67,7 @@ func (bot *Bot) Register(pattern string, handler Handler) error {
 // Register a commandhandler. The handler is invoked when a message is
 // received which starts with /command. 
 func (bot *Bot) RegisterCommand(command string, handler Handler) error {
-	return bot.Register("^\\/" + command + "(\\s+|$)", handler)
+	return bot.Register("^\\/" + command + "(\\s+|$|@" + bot.Self.UserName + "(\\s+|$))", handler)
 }
 
 // Listen for updates, and handle messages when they are received.
