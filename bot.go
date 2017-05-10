@@ -38,6 +38,12 @@ func (bot *Bot) Init(token string, timeout int) error {
 	bot.updates.Clear()	
 	log.Printf("Starting on account @%s", bot.Self.UserName)
 
+	if bot.Debug {
+		bot.Register(MessageHandler(debugMessageHandler))
+		bot.Register(MessageHandler(debugCommandHandler))
+		bot.Register(InlineQueryHandler(debugInlineQueryHandler))
+	}
+
 	return nil
 }
 
@@ -74,4 +80,18 @@ func (bot *Bot) QuickReply(msg *tg.Message, text string) {
 	reply := tg.NewMessage(msg.Chat.ID, text)
 	reply.ReplyToMessageID = msg.MessageID
 	bot.Send(reply)
+}
+
+func debugMessageHandler(msg *tg.Message) {
+	log.Printf("[%s]: %s", msg.From.UserName, msg.Text)
+}
+
+func debugCommandHandler(msg *tg.Message) {
+	if msg.IsCommand() {
+		log.Printf("Received command from %s: /%s", msg.From.UserName, msg.Command())
+	}
+}
+
+func debugInlineQueryHandler(iq *tg.InlineQuery) {
+	log.Printf("Received inline query from %s: %s", iq.From.UserName, iq.Query)
 }
