@@ -59,9 +59,13 @@ func (p *Pytho) Init(token string, timeout int) error {
 		return err
 	}
 
-	p.RegisterCommand("lennies", p.handleLennies)
-	p.RegisterCommand("bf", p.handleBrainfuck)
-	p.RegisterMessageHandler("\\/lenny", p.handleLenny)
+	rh, err := CreateRegexHandler("\\/lenny", p.handleLenny)
+	if err != nil {
+		return err
+	}
+	p.Register(rh)
+	p.Register(CreateCommandHandler("lennies", p.handleLennies))
+	p.Register(CreateCommandHandler("bf", p.handleBrainfuck))
 
 	return nil
 }
