@@ -60,8 +60,8 @@ func (p *Pytho) Init(token string, timeout int) error {
 	}
 
 	p.RegisterCommand("lennies", p.handleLennies)
-	p.RegisterCommand("lenny", p.handleLenny)
 	p.RegisterCommand("bf", p.handleBrainfuck)
+	p.RegisterMessageHandler("\\/lenny", p.handleLenny)
 
 	return nil
 }
@@ -69,44 +69,6 @@ func (p *Pytho) Init(token string, timeout int) error {
 // Handle the '/lennies' command
 func (p *Pytho) handleLennies(msg *tg.Message) {
 	p.QuickSend(msg, lenniesList);
-}
-
-// Handle the '/lenny' command
-func (p *Pytho) handleLenny(msg *tg.Message) {
-	p.QuickSend(msg, decodeLennyArgs(msg.Text))
-}
-
-// Decode a string and use the first argument to get the
-// right lenny.
-func decodeLennyArgs(text string) string {
-	args := strings.Split(text, " ")
-
-	if len(args) < 2 {
-		return lennies["lenny"]
-	} else if args[1] == "random" {
-		return ranLenny()
-	}
-
-	lenny, ok := lennies[strings.ToLower(args[1])]
-
-	if ok {
-		return lenny
-	} else {
-		return "Error: invalid lenny"
-	}
-}
-
-// Return a random lenny. Panics if no random lenny was picked (should never happen).
-func ranLenny() string {
-	i := rand.Intn(len(lennies))
-	for _, v := range lennies {
-		if i == 0 {
-			return v
-		}
-		i--
-	}
-
-	panic("Internal error")
 }
 
 // handle the '/bf' command
@@ -137,4 +99,49 @@ func (p *Pytho) handleBrainfuck(msg *tg.Message) {
 	if output != "" {
 		p.QuickReply(msg, output)
 	}
+}
+
+// Handle the '/lenny' command
+func (p *Pytho) handleLenny(msg *tg.Message) {
+	p.QuickSend(msg, decodeLennyArgs(msg.Text))
+}
+
+// Decode a string and use the first argument to get the
+// right lenny.
+func decodeLennyArgs(text string) string {
+	args := strings.Split(text, " ")
+
+	for i, w := range args {
+		if w == "/lenny" {
+			args = args[i:]
+			break
+		}
+	}
+
+	if len(args) < 2 {
+		return lennies["lenny"]
+	} else if args[1] == "random" {
+		return ranLenny()
+	}
+
+	lenny, ok := lennies[strings.ToLower(args[1])]
+
+	if ok {
+		return lenny
+	} else {
+		return "Error: invalid lenny"
+	}
+}
+
+// Return a random lenny. Panics if no random lenny was picked (should never happen).
+func ranLenny() string {
+	i := rand.Intn(len(lennies))
+	for _, v := range lennies {
+		if i == 0 {
+			return v
+		}
+		i--
+	}
+
+	panic("Internal error")
 }
