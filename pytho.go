@@ -115,6 +115,7 @@ func (p *Pytho) handleBrainfuck(msg *tg.Message) {
 
 	if len(args) == 1 {
 		p.QuickReply(msg, "Error: Not enough arguments")
+		return
 	}
 
 	data := strings.SplitN(args[1], "@", 2)
