@@ -123,6 +123,8 @@ func (p *Pytho) handleBrainfuck(msg *tg.Message) {
 
 	if len(data) == 2 {
 		input = data[1]
+	} else if msg.ReplyToMessage != nil {
+		input = msg.ReplyToMessage.Text
 	}
 
 	var bf BrainfuckContext
@@ -136,6 +138,10 @@ func (p *Pytho) handleBrainfuck(msg *tg.Message) {
 	output := bf.Output()
 
 	if output != "" {
-		p.QuickReply(msg, output)
+		if msg.ReplyToMessage != nil {
+			p.QuickReply(msg.ReplyToMessage, output)			
+		} else {
+			p.QuickReply(msg, output)
+		}
 	}
 }
