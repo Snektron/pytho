@@ -29,8 +29,10 @@ func token() string {
 func main() {
 	tok := token()
 
+	_, debug := os.LookupEnv("PYTHO_DEBUG")
+
 	var pytho Pytho
-	pytho.Debug = true
+	pytho.Debug = debug
 
 	err := pytho.Init(tok, 60)
 	if err != nil {
